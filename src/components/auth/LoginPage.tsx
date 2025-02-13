@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
 import Link from 'next/link';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AxiosError } from 'axios';
 
 export const LoginPage = () => {
   const router = useRouter();
@@ -23,9 +24,13 @@ export const LoginPage = () => {
 
     try {
       await authService.login(formData);
-      router.push('/dashboard'); // O donde quieras redirigir después del login
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Credenciales inválidas');
+      router.push('/dashboard');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError(error.response?.data?.message || 'Error al iniciar sesión');
+      } else {
+        setError('Error al iniciar sesión');
+      }
     } finally {
       setLoading(false);
     }

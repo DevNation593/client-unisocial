@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
 import Link from 'next/link';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AxiosError } from 'axios';
 
 export const RegisterPage = () => {
   const router = useRouter();
@@ -25,9 +26,13 @@ export const RegisterPage = () => {
 
     try {
       await authService.register(formData);
-      router.push('/dashboard'); // O donde quieras redirigir después del registro
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Error al registrar usuario');
+      router.push('/dashboard');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError(error.response?.data?.message || 'Error al registrar usuario');
+      } else {
+        setError('Error al registrar usuario');
+      }
     } finally {
       setLoading(false);
     }
