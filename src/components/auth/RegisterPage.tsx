@@ -40,20 +40,17 @@ export const RegisterPage = () => {
       general: ''
     };
 
-    // Validación del nombre
     if (formData.name.trim().length < 3) {
       newErrors.name = 'El nombre debe tener al menos 3 caracteres';
       isValid = false;
     }
 
-    // Validación del email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       newErrors.email = 'Por favor, introduce un email válido';
       isValid = false;
     }
 
-    // Validación de la contraseña
     if (formData.password.length < 8) {
       newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
       isValid = false;
@@ -62,7 +59,6 @@ export const RegisterPage = () => {
       isValid = false;
     }
 
-    // Validación de confirmación de contraseña
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Las contraseñas no coinciden';
       isValid = false;
@@ -78,10 +74,13 @@ export const RegisterPage = () => {
     if (!validateForm()) {
       return;
     }
-
+  
     try {
-      const { confirmPassword, ...registerData } = formData;
-      const result = await register(registerData);
+      const { password, confirmPassword: _, ...registerData } = formData;
+      const result = await register({
+        ...registerData,
+        password
+      });
       
       if (!result.success) {
         setErrors(prev => ({
@@ -90,9 +89,10 @@ export const RegisterPage = () => {
         }));
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       setErrors(prev => ({
         ...prev,
-        general: 'Ocurrió un error durante el registro.'
+        general: `Ocurrió un error durante el registro: ${errorMessage}`
       }));
     }
   };
@@ -103,7 +103,6 @@ export const RegisterPage = () => {
       ...prev,
       [name]: value
     }));
-    // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({
         ...prev,
