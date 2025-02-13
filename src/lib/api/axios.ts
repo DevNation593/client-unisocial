@@ -39,7 +39,3 @@ const createApiInstance = (baseURL: string) => {
   return instance;
 };
 
-// Crear instancias para diferentes microservicios
-export const authApi = createApiInstance(process.env.NEXT_PUBLIC_AUTH_SERVICE_URL);
-export const userApi = createApiInstance(process.env.NEXT_PUBLIC_USER_SERVICE_URL);
-export const contentApi = createApiInstance(process.env.NEXT_PUBLIC_CONTENT_SERVICE_URL);
