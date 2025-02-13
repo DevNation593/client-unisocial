@@ -6,15 +6,17 @@ interface UseApiOptions<T> {
   onError?: (error: AxiosError) => void;
 }
 
-export function useApi<T>(
-  apiCall: (...args: any[]) => Promise<T>,
+type ApiParams = Record<string, unknown>;
+
+export function useApi<T, P extends ApiParams[]>(
+  apiCall: (...args: P) => Promise<T>,
   options: UseApiOptions<T> = {}
 ) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<AxiosError | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const execute = async (...args: any[]) => {
+  const execute = async (...args: P) => {
     try {
       setLoading(true);
       setError(null);
@@ -22,10 +24,11 @@ export function useApi<T>(
       setData(result);
       options.onSuccess?.(result);
       return result;
-    } catch (err) {
-      const error = err as AxiosError;
-      setError(error);
-      options.onError?.(error);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError(error);
+        options.onError?.(error);
+      }
       throw error;
     } finally {
       setLoading(false);

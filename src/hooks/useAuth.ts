@@ -24,29 +24,29 @@ export const useAuth = () => {
     }
   };
 
-  const login = async (credentials: LoginCredentials) => {
-    try {
-      const { user, token } = await authService.login(credentials);
-      setUser(user);
-      router.push('/dashboard');
-      return { success: true };
-    } catch (error) {
-      console.error('Login failed:', error);
-      return { success: false, error };
-    }
-  };
+const login = async (credentials: LoginCredentials) => {
+  try {
+    const response = await authService.login(credentials);
+    setUser(response.user);
+    router.push('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Login failed:', error);
+    return { success: false, error };
+  }
+};
 
-  const register = async (credentials: RegisterCredentials) => {
-    try {
-      const { user, token } = await authService.register(credentials);
-      setUser(user);
-      router.push('/dashboard');
-      return { success: true };
-    } catch (error) {
-      console.error('Registration failed:', error);
-      return { success: false, error };
-    }
-  };
+const register = async (credentials: RegisterCredentials) => {
+  try {
+    const response = await authService.register(credentials);
+    setUser(response.user);
+    router.push('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Registration failed:', error);
+    return { success: false, error };
+  }
+};
 
   const logout = async () => {
     try {

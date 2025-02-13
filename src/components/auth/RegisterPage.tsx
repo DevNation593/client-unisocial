@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -74,13 +75,18 @@ export const RegisterPage = () => {
     if (!validateForm()) {
       return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrors(prev => ({
+        ...prev,
+        confirmPassword: 'Las contraseñas no coinciden'
+      }));
+      return;
+    }
   
     try {
-      const { password, confirmPassword: _, ...registerData } = formData;
-      const result = await register({
-        ...registerData,
-        password
-      });
+      const { confirmPassword, ...registerData } = formData;
+      const result = await register(registerData);
       
       if (!result.success) {
         setErrors(prev => ({

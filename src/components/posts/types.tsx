@@ -6,12 +6,12 @@ export interface Post {
   createdAt?: string;
 }
 
-export interface CreatePostDTO {
-  title: string;
-  content: string;
+export interface CreatePostFormProps {
+  onSubmit: (post: { title: string; content: string }) => Promise<void>;
 }
 
-export interface UpdatePostDTO {
-  title?: string;
-  content?: string;
+export interface PostListProps {
+  posts: Post[];
+  onDelete?: (id: string) => Promise<void>;
+  onEdit?: (id: string, post: Partial<Post>) => Promise<void>;
 }
