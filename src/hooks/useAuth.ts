@@ -1,18 +1,69 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store/store';
-import { login, logout } from '../store/slices/authSlice';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { authService, User, LoginCredentials, RegisterCredentials } from '../services/authService';
 
 export const useAuth = () => {
-  const dispatch = useDispatch();
-  const auth = useSelector((state: RootState) => state.auth);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      if (authService.isAuthenticated()) {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Authentication check failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      const { user, token } = await authService.login(credentials);
+      setUser(user);
+      router.push('/dashboard');
+      return { success: true };
+    } catch (error) {
+      console.error('Login failed:', error);
+      return { success: false, error };
+    }
+  };
+
+  const register = async (credentials: RegisterCredentials) => {
+    try {
+      const { user, token } = await authService.register(credentials);
+      setUser(user);
+      router.push('/dashboard');
+      return { success: true };
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return { success: false, error };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await authService.logout();
+      setUser(null);
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return {
-    isAuthenticated: !!auth.token,
-    user: auth.user,
-    loading: auth.loading,
-    error: auth.error,
-    login: (credentials: { email: string; password: string }) => 
-      dispatch(login(credentials)),
-    logout: () => dispatch(logout()),
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    isAuthenticated: !!user,
   };
 };
