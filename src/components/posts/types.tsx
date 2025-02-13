@@ -1,17 +1,13 @@
 export interface Post {
   id: string;
-  title: string;
+  user: string;
   content: string;
-  author: string;
-  createdAt?: string;
+  imageUrl?: string;
+  timestamp: string;
 }
 
-export interface CreatePostFormProps {
-  onSubmit: (post: { title: string; content: string }) => Promise<void>;
-}
-
-export interface PostListProps {
-  posts: Post[];
-  onDelete?: (id: string) => Promise<void>;
-  onEdit?: (id: string, post: Partial<Post>) => Promise<void>;
+export interface CreatePostDTO {
+  user: string;
+  content: string;
+  imageUrl?: string;
 }

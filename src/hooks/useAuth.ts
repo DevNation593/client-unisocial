@@ -1,6 +1,9 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService, User, LoginCredentials, RegisterCredentials } from '../services/authService';
+import { authService } from '../services/authService';
+import { User, LoginDTO, RegisterDTO } from '@/types/auth';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -14,47 +17,55 @@ export const useAuth = () => {
   const checkAuth = async () => {
     try {
       if (authService.isAuthenticated()) {
-        const userData = await authService.getCurrentUser();
+        const userData = authService.getCurrentUser();
         setUser(userData);
       }
     } catch (error) {
-      console.error('Authentication check failed:', error);
+      console.error('Error verificando autenticación:', error);
     } finally {
       setLoading(false);
     }
   };
 
-const login = async (credentials: LoginCredentials) => {
-  try {
-    const response = await authService.login(credentials);
-    setUser(response.user);
-    router.push('/dashboard');
-    return { success: true };
-  } catch (error) {
-    console.error('Login failed:', error);
-    return { success: false, error };
-  }
-};
+  const login = async (credentials: LoginDTO) => {
+    try {
+      const response = await authService.login(credentials);
+      setUser(response.user);
+      router.push('/dashboard');
+      return { success: true };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
+      console.error('Error en login:', errorMessage);
+      return { 
+        success: false, 
+        error: errorMessage
+      };
+    }
+  };
 
-const register = async (credentials: RegisterCredentials) => {
-  try {
-    const response = await authService.register(credentials);
-    setUser(response.user);
-    router.push('/dashboard');
-    return { success: true };
-  } catch (error) {
-    console.error('Registration failed:', error);
-    return { success: false, error };
-  }
-};
+  const register = async (credentials: RegisterDTO) => {
+    try {
+      const response = await authService.register(credentials);
+      setUser(response.user);
+      router.push('/dashboard');
+      return { success: true };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error en el registro';
+      console.error('Error en registro:', errorMessage);
+      return { 
+        success: false, 
+        error: errorMessage
+      };
+    }
+  };
 
   const logout = async () => {
     try {
-      await authService.logout();
+      authService.logout();
       setUser(null);
       router.push('/login');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Error al cerrar sesión:', error);
     }
   };
 
@@ -64,6 +75,8 @@ const register = async (credentials: RegisterCredentials) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: authService.isAuthenticated(),
   };
 };
+
+export default useAuth;
