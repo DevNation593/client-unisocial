@@ -7,7 +7,11 @@ export interface Post {
 }
 
 export interface CreatePostDTO {
-  user: string;
   content: string;
+  imageUrl?: string;
+}
+
+export interface UpdatePostDTO {
+  content?: string;
   imageUrl?: string;
 }
